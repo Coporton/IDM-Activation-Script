@@ -1,11 +1,5 @@
 # Notice:
 
-## This project has been archived and is no longer being maintained.
-
-I've switched to FDM, don't want to keep up with IDM new nags anymore.
-
-------------------------------------------------------------------------
-
 ## IDM Activation Script
 
 An open-source tool to activate and reset the trial of [Internet Download Manager](https://www.internetdownloadmanager.com/)
@@ -15,12 +9,12 @@ An open-source tool to activate and reset the trial of [Internet Download Manage
 -   IDM freeze trial and activation with registry key lock method
 -   Activation and trial persist even after installing IDM updates
 -   IDM trial reset
--   Fully open source
+-   Fully open-source
 -   Based on the transparent batch script
 
 ## IAS Latest Release
 
-Last Release - v1.2 (12-Feb-2024)\
+Last Release - v1.3 (16-Aug-2024)\
 [GitHub](https://github.com/Coporton/IDM-Activation-Script) - [BitBucket](https://bitbucket.org/Coporton/idm-activation-script/)
 
 ## Download / How to use it?
@@ -101,7 +95,7 @@ Last Release - v1.2 (12-Feb-2024)\
 #### v1.1
 
 -   IDM update 6.42b3 has started showing fake serial popups with IAS activation, due to this we have removed the activation option and replaced it with the Freeze trial option to lock the 30-day trial period for the lifetime.
--   Now the script will disable quick-edit in CMD windows using Powershell instead of editing registry, thanks to @abbodi1406 for the code and @awuctl for the idea.
+-   Now the script will disable quick-edit in CMD windows using Powershell instead of editing the registry, thanks to @abbodi1406 for the code and @awuctl for the idea.
 -   Code to relaunch script with conhost.exe to avoid terminal app is now merged in quick-edit disable code, thanks to @abbodi1406.
 
 #### v1.0
