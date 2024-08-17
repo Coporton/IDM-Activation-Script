@@ -401,7 +401,7 @@ echo:
 echo:
 echo:
 echo:
-echo:                This script is NOT working with latest IDM.     
+echo:        This script may NOT WORKING with latest IDM but you can try.     
 echo:            ___________________________________________________ 
 echo:                                                               
 echo:               [1] Freeze Trial
