@@ -9,7 +9,7 @@
 ::   IDM Activation Script (IAS)
 ::
 ::   Homepages: https://github.com/Coporton/IDM-Activation-Script
-::              https://coporton.com/idm-activation-script
+::              https://coporton.com/topics/idm-activation-script
 ::
 ::       Email: coporton@protonmail.com
 ::
@@ -73,7 +73,7 @@ echo:
 echo Null service is not running, script may crash...
 echo:
 echo:
-echo Help - %copo%idm-activation-script/#Troubleshoot
+echo Help - %copo%topics/idm-activation-script/#Troubleshoot
 echo:
 echo:
 ping 127.0.0.1 -n 10
@@ -214,7 +214,7 @@ echo:
 echo PowerShell is not working. Aborting...
 echo If you have applied restrictions on Powershell then undo those changes.
 echo:
-echo Check this page for help. %copo%idm-activation-script#Troubleshoot
+echo Check this page for help. %copo%topics/idm-activation-script#Troubleshoot
 goto done2
 )
 
@@ -287,7 +287,7 @@ echo:
 call :_color %_Green% "Enter a menu option in the Keyboard [1,0] :"
 choice /C:10 /N
 if !errorlevel!==2 rem
-if !errorlevel!==1 (start https://github.com/Coporton/IDM-Activation-Script & start %copo%/idm-activation-script & exit /b)
+if !errorlevel!==1 (start https://github.com/Coporton/IDM-Activation-Script & start %copo%topics/idm-activation-script & exit /b)
 )
 )
 
@@ -307,7 +307,7 @@ echo Initializing...
 echo:
 echo WMI is not working. Aborting...
 echo:
-echo Check this page for help. %copo%idm-activation-script/#Troubleshoot
+echo Check this page for help. %copo%topics/idm-activation-script/#Troubleshoot
 goto done2
 )
 
@@ -326,7 +326,7 @@ echo:
 echo [%_sid%]
 echo User Account SID not found. Aborting...
 echo:
-echo Check this page for help. %copo%idm-activation-script#Troubleshoot
+echo Check this page for help. %copo%topics/idm-activation-script#Troubleshoot
 goto done2
 )
 
@@ -378,7 +378,7 @@ set "idmcheck=tasklist /fi "imagename eq idman.exe" | findstr /i "idman.exe" %nu
 %eline%
 echo Failed to write in %CLSID2%
 echo:
-echo Check this page for help. %copo%idm-activation-script#Troubleshoot
+echo Check this page for help. %copo%topics/idm-activation-script#Troubleshoot
 goto done2
 )
 
@@ -419,7 +419,7 @@ choice /C:123450 /N
 set _erl=%errorlevel%
 
 if %_erl%==6 exit /b
-if %_erl%==5 start https://github.com/Coporton/IDM-Activation-Script & start https://coporton.com/idm-activation-script & goto MainMenu
+if %_erl%==5 start https://github.com/Coporton/IDM-Activation-Script & start https://coporton.com/topics/idm-activation-script & goto MainMenu
 if %_erl%==4 start https://www.internetdownloadmanager.com/download.html & goto MainMenu
 if %_erl%==3 goto _reset
 if %_erl%==2 (set frz=0&goto :_activate)
@@ -592,7 +592,7 @@ if not defined _fileexist (
 %eline%
 echo Error: Unable to download files with IDM.
 echo:
-echo Help: %copo%idm-activation-script#Troubleshoot
+echo Help: %copo%topics/idm-activation-script#Troubleshoot
 goto :done
 )
 
@@ -656,8 +656,8 @@ echo:
 echo Applying registration details...
 echo:
 
-set /a fname = %random% %% 9999 + 1000
-set /a lname = %random% %% 9999 + 1000
+set /a fname = Coporton
+set /a lname = WorkStation
 set email=%fname%.%lname%@tonec.com
 
 for /f "delims=" %%a in ('%psc% "$key = -join ((Get-Random -Count  20 -InputObject ([char[]]('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))));$key = ($key.Substring(0,  5) + '-' + $key.Substring(5,  5) + '-' + $key.Substring(10,  5) + '-' + $key.Substring(15,  5) + $key.Substring(20));Write-Output $key" %nul6%') do (set key=%%a)
