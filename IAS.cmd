@@ -656,7 +656,7 @@ echo:
 echo Applying registration details...
 echo:
 
-set /a fname=Copo%blank%rton
+set /a "fname=Copo%blank%rton"
 set /a lname=WorkStation
 set email=%fname%.%lname%@tonec.com
 
