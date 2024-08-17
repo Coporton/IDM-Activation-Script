@@ -656,8 +656,8 @@ echo:
 echo Applying registration details...
 echo:
 
-set "fname=Copo%blank%rton"
-set lname=WorkStation
+set fname=Cop%blank%ort%blank%on
+set lname=Wor%blank%kStat%blank%ion
 set email=%fname%.%lname%@tonec.com
 
 for /f "delims=" %%a in ('%psc% "$key = -join ((Get-Random -Count  20 -InputObject ([char[]]('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'))));$key = ($key.Substring(0,  5) + '-' + $key.Substring(5,  5) + '-' + $key.Substring(10,  5) + '-' + $key.Substring(15,  5) + $key.Substring(20));Write-Output $key" %nul6%') do (set key=%%a)
