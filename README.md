@@ -141,8 +141,7 @@ Last Release - v1.2 (12-Feb-2024)\
 | AveYo aka BAU                               | [reg_own lean and mean snippet](https://pastebin.com/XTPt0JSC)                                                                                                                                                                         |
 | [abbodi1406](https://github.com/abbodi1406) | Help in coding                                                                                                                                                                                                                         |
 | WindowsAddict                               | IAS Author                                                                                                                                                                                                                             |
-                                                      |
-| Coporton                               | IAS Developer                                                                                                                                                                                                                             |
+| Coporton                                    | IAS Developer                                                                                                                                                                                                                          |
 
 And thanks to the IAS users for their interest, feedback, and assistance.
 
