@@ -24,7 +24,7 @@ Last Release - v1.3 (16-Aug-2024)\
 
 ## Note
 
--   📌 The activation option is currently not working in the script, use the Freeze trial option to lock 30-day trial period for the lifetime.
+-   📌 The activation option is currently not working in the script, use the Freeze trial option to lock the 30-day trial period for the lifetime.
 
 ### Method 1 - PowerShell
 
@@ -84,9 +84,13 @@ Last Release - v1.3 (16-Aug-2024)\
 ## Troubleshoot
 
 -   Browser Integration Fix: [Chrome](https://www.internetdownloadmanager.com/register/new_faq/bi9.html) - [Firefox](https://www.internetdownloadmanager.com/register/new_faq/bi4.html)
--   Raise the issue on [Github](https://github.com/WindowsAddict/IDM-Activation-Script) with screenshots.
+-   Raise the issue on [GitHub](https://github.com/WindowsAddict/IDM-Activation-Script) with screenshots.
 
 ## Changelog
+
+#### v1.3
+
+-   Added back activation option with a developer name, email, and key in registration details along with a warning that it's not working for some users, the recommended option is to use Freeze trial.
 
 #### v1.2
 
