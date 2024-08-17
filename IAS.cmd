@@ -394,25 +394,27 @@ if %_freeze%==1 (set frz=1&goto :_activate)
 
 cls
 title  IDM Activation Script %iasver%
-if not defined terminal mode 75, 28
+if not defined terminal mode 90, 35
 
 echo:
 echo:
 echo:
 echo:
 echo:
-echo:        This script may NOT WORKING with latest IDM but you can try.     
-echo:            ___________________________________________________ 
+echo:
+echo:
+echo:           This script may NOT WORKING with latest IDM but you can try.     
+echo:               ___________________________________________________ 
 echo:                                                               
-echo:               [1] Freeze Trial
-echo:               [2] Activate
-echo:               [3] Reset Activation / Trial
-echo:               _____________________________________________   
+echo:                  [1] Freeze Trial
+echo:                  [2] Activate
+echo:                  [3] Reset Activation / Trial
+echo:                  _____________________________________________   
 echo:                                                               
-echo:               [4] Download IDM
-echo:               [5] Help
-echo:               [0] Exit
-echo:            ___________________________________________________
+echo:                  [4] Download IDM
+echo:                  [5] Help
+echo:                  [0] Exit
+echo:               ___________________________________________________
 echo:         
 call :_color2 %_White% "             " %_Green% "Enter a menu option in the Keyboard [1,2,3,4,5,0]"
 choice /C:123450 /N
