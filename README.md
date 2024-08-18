@@ -84,7 +84,7 @@ Last Release - v1.3 (16-Aug-2024)\
 ## Troubleshoot
 
 -   Browser Integration Fix: [Chrome](https://www.internetdownloadmanager.com/register/new_faq/bi9.html) - [Firefox](https://www.internetdownloadmanager.com/register/new_faq/bi4.html)
--   Raise the issue on [GitHub](https://github.com/WindowsAddict/IDM-Activation-Script) with screenshots.
+-   Raise the issue on [GitHub](https://github.com/Coporton/IDM-Activation-Script) with screenshots.
 
 ## Changelog
 
@@ -121,7 +121,7 @@ Last Release - v1.3 (16-Aug-2024)\
 
 #### v0.8
 
--   Move the project to [Github](https://github.com/Coporton/IDM-Activation-Script) and [coporton.com](https://coporton.com/idm-activation-script)
+-   Move the project to [Github](https://github.com/Coporton/IDM-Activation-Script) and [coporton.com](https://coporton.com/topics/idm-activation-script)
 -   Minor bug fixes
 -   Add info to inform users that empty registry keys are being deleted when the script deletes a lot of them
 
