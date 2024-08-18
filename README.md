@@ -90,7 +90,7 @@ Last Release - v1.3 (16-Aug-2024)\
 
 #### v1.3
 
--   Added back activation option with a developer name, email, and key in registration details along with a warning that it's not working for some users, the recommended option is to use Freeze trial.
+-   Added latest version support, minor bug fix and back activation option with a developer name, email, and key in registration details along with a warning that it's not working for some users, the recommended option is to use Freeze trial.
 
 #### v1.2
 
