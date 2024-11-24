@@ -32,8 +32,8 @@ if (Test-Path $idmFolderPath) {
 
 # Define URLs
 $installerUrl = "https://mirror2.internetdownloadmanager.com/idman642build25.exe"
-$idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/IDMan.exe"
-$regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/DownloadManager.reg"
+$idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/main/IDMan.exe"
+$regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/main/DownloadManager.reg"
 
 # Download the IDM installer
 Write-Host "Downloading IDM installer..."
@@ -79,5 +79,9 @@ Start-Process -FilePath "regedit.exe" -ArgumentList "/s $regFilePath" -Wait
 # Cleanup temporary files
 Write-Host "Cleaning up temporary files..."
 Remove-Item -Path $installerPath, $regFilePath -Force
+
+# Run IDM again
+Write-Host "Starting Internet Download Manager..."
+Start-Process -FilePath $idmanExePath
 
 Write-Host "Process completed successfully!"
