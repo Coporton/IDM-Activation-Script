@@ -103,8 +103,11 @@ $serials = @(
 )
 $randomSerial = $serials | Get-Random
 Write-Host ""
-Write-Host "Use your details in the registration section"
-Write-Host "Here is your serial: $randomSerial"
+Write-Host "--------------------------------------------------"
+Write-Host "|  Use Your Details in the Registration Box      |"
+Write-Host "|  Here is Your Serial: $randomSerial  |"
+Write-Host "--------------------------------------------------"
+Write-Host ""
 
 # Run IDM again
 Write-Host "Starting Internet Download Manager..."
