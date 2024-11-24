@@ -12,6 +12,13 @@ $regFilePath = "$env:TEMP\DownloadManager.reg"
 Write-Host "Downloading IDM installer..."
 Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
 
+# Check for elevation
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "Restarting script with administrator privileges..."
+    Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    exit
+}
+
 # Install IDM normally
 Write-Host "Installing IDM normally..."
 Start-Process -FilePath $installerPath -NoNewWindow -Wait
