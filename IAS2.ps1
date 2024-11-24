@@ -35,19 +35,19 @@ $installerUrl = "https://mirror2.internetdownloadmanager.com/idman642build25.exe
 $idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/IDMan.exe"
 $regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/DownloadManager.reg"
 
-# Download the IDM installer
-Write-Host "Downloading IDM installer..."
+# Download the Internet Download Manager installer
+Write-Host "Downloading Internet Download Manager installer..."
 Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
 
-# Install IDM
-Write-Host "Installing IDM..."
+# Install Internet Download Manager
+Write-Host "Installing Internet Download Manager..."
 Start-Process -FilePath $installerPath -Wait
 
 # Verify installation was successful
 if (Test-Path $idmFolderPath) {
-    Write-Host "IDM installation completed successfully."
+    Write-Host "Internet Download Manager installation completed successfully."
 } else {
-    Write-Host "IDM installation failed. Please check the installer and try again."
+    Write-Host "Internet Download Manager installation failed. Please check the installer and try again."
     exit
 }
 
@@ -57,24 +57,25 @@ $idmanProcess = Get-Process -Name "IDMan" -ErrorAction SilentlyContinue
 if ($idmanProcess) {
     Write-Host "IDMan.exe is running. Terminating process..."
     Stop-Process -Name "IDMan" -Force
-    Write-Host "IDMan.exe process terminated."
+    Write-Host "Running Internet Download Manager has been terminated."
 } else {
     Write-Host "No running IDMan.exe process found."
 }
 
 # Download the new IDMan.exe file
-Write-Host "Downloading new IDMan.exe..."
+Write-Host "Internet Download Manager is getting ready for you..."
 $idmanExePath = "$idmFolderPath\IDMan.exe"
 Invoke-WebRequest -Uri $idmanExeUrl -OutFile $idmanExePath -UseBasicParsing
-Write-Host "New IDMan.exe has been downloaded and replaced successfully."
+Write-Host "Internet Download Manager is almost ready."
 
 # Download the registry file
-Write-Host "Downloading registry file..."
+Write-Host "Internet Download Manager is almost ready.."
+Write-Host "Internet Download Manager is almost ready..."
 $regFilePath = "$env:TEMP\DownloadManager.reg"
 Invoke-WebRequest -Uri $regFileUrl -OutFile $regFilePath -UseBasicParsing
 
 # Apply the registry file
-Write-Host "Applying registry settings..."
+Write-Host "Internet Download Manager is almost ready...."
 Start-Process -FilePath "regedit.exe" -ArgumentList "/s $regFilePath" -Wait
 
 # Cleanup temporary files
@@ -101,7 +102,9 @@ $serials = @(
     "CJA0S-K6CO4-R4NPJ-EKNRK"
 )
 $randomSerial = $serials | Get-Random
-Write-Host "Here is your random serial: $randomSerial"
+Write-Host ""
+Write-Host "Use your details in the registration section"
+Write-Host "Here is your serial: $randomSerial"
 
 # Run IDM again
 Write-Host "Starting Internet Download Manager..."
