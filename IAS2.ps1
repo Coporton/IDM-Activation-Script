@@ -25,11 +25,12 @@ function Uninstall-IDM {
     }
 }
 
-# Function to generate a random 16-character alphanumeric key
+# Function to generate a truly random 16-character alphanumeric key
 function Generate-RandomKey {
-    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    $key = -join ((1..16) | ForEach-Object { $chars | Get-Random })
-    return ($key.Substring(0,4) + "-" + $key.Substring(4,4) + "-" + $key.Substring(8,4) + "-" + $key.Substring(12,4))
+    $chars = @('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+               '0','1','2','3','4','5','6','7','8','9') # Explicitly create the array of characters
+    $key = -join ((1..16) | ForEach-Object { $chars | Get-Random }) # Randomly pick 16 characters
+    return ($key.Substring(0,4) + "-" + $key.Substring(4,4) + "-" + $key.Substring(8,4) + "-" + $key.Substring(12,4)) # Format the key
 }
 
 # Check if IDM is already installed
