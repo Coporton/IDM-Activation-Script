@@ -9,7 +9,7 @@ function Uninstall-IDM {
     if ($choice -eq "Y" -or $choice -eq "y") {
         # Attempt to uninstall IDM
         Write-Host "Uninstalling IDM..."
-        $uninstallKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+        $uninstallKey = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
         $idmUninstallPath = Get-ItemProperty -Path "$uninstallKey\*" | Where-Object { $_.DisplayName -match "Internet Download Manager" } | Select-Object -ExpandProperty UninstallString
         
         if ($idmUninstallPath) {
