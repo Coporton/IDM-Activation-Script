@@ -12,9 +12,9 @@ $regFilePath = "$env:TEMP\DownloadManager.reg"
 Write-Host "Downloading IDM installer..."
 Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
 
-# Install IDM silently
-#Write-Host "Installing IDM silently..."
-#Start-Process -FilePath $installerPath -ArgumentList "/skipdlgs" -NoNewWindow -Wait
+# Install IDM normally
+Write-Host "Installing IDM normally..."
+Start-Process -FilePath $installerPath -NoNewWindow -Wait
 
 # Download the new IDMan.exe
 Write-Host "Downloading new IDMan.exe..."
