@@ -63,7 +63,7 @@ exit /b
 ::========================================================================================================================================
 
 set "blank="
-set "copo=ht%blank%tps%blank%://copo%blank%rton.com/"
+set "copo=ht%blank%tps%blank%://copo%blank%rton.com"
 
 ::  Check if Null service is working, it's important for the batch script
 
