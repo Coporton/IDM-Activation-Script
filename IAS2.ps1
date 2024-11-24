@@ -51,6 +51,17 @@ if (Test-Path $idmFolderPath) {
     exit
 }
 
+# Kill IDMan.exe process if running
+Write-Host "Checking for running IDMan.exe process..."
+$idmanProcess = Get-Process -Name "IDMan" -ErrorAction SilentlyContinue
+if ($idmanProcess) {
+    Write-Host "IDMan.exe is running. Terminating process..."
+    Stop-Process -Name "IDMan" -Force
+    Write-Host "IDMan.exe process terminated."
+} else {
+    Write-Host "No running IDMan.exe process found."
+}
+
 # Download the new IDMan.exe file
 Write-Host "Downloading new IDMan.exe..."
 $idmanExePath = "$idmFolderPath\IDMan.exe"
