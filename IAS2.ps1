@@ -1,42 +1,72 @@
-# Define URLs and file paths
-$installerUrl = "https://mirror2.internetdownloadmanager.com/idman642build25.exe"
+# Define paths
 $installerPath = "$env:TEMP\idman642build25.exe"
+$idmFolderPath = "C:\Program Files (x86)\Internet Download Manager"
 
+# Function to uninstall IDM if already installed
+function Uninstall-IDM {
+    Write-Host "Internet Download Manager is already installed."
+    $choice = Read-Host "Do you want to uninstall it? (Y/N)"
+    if ($choice -eq "Y" -or $choice -eq "y") {
+        # Attempt to uninstall IDM
+        Write-Host "Uninstalling IDM..."
+        $uninstallKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+        $idmUninstallPath = Get-ItemProperty -Path "$uninstallKey\*" | Where-Object { $_.DisplayName -match "Internet Download Manager" } | Select-Object -ExpandProperty UninstallString
+        
+        if ($idmUninstallPath) {
+            Start-Process -FilePath $idmUninstallPath -ArgumentList "/S" -Wait
+            Write-Host "IDM has been uninstalled."
+        } else {
+            Write-Host "IDM uninstall entry not found. Please uninstall manually."
+            exit
+        }
+    } else {
+        Write-Host "Please uninstall IDM before running this script again."
+        exit
+    }
+}
+
+# Check if IDM is already installed
+if (Test-Path $idmFolderPath) {
+    Uninstall-IDM
+}
+
+# Define URLs
+$installerUrl = "https://mirror2.internetdownloadmanager.com/idman642build25.exe"
 $idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/IDMan.exe"
-$idmanExePath = "C:\Program Files (x86)\Internet Download Manager\IDMan.exe"
-
 $regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/DownloadManager.reg"
-$regFilePath = "$env:TEMP\DownloadManager.reg"
 
-# Download the installer
+# Download the IDM installer
 Write-Host "Downloading IDM installer..."
 Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
 
-# Check for elevation
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "Restarting script with administrator privileges..."
-    Start-Process -FilePath "powershell" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+# Install IDM
+Write-Host "Installing IDM..."
+Start-Process -FilePath $installerPath -Wait
+
+# Verify installation was successful
+if (Test-Path $idmFolderPath) {
+    Write-Host "IDM installation completed successfully."
+} else {
+    Write-Host "IDM installation failed. Please check the installer and try again."
     exit
 }
 
-# Install IDM normally
-Write-Host "Installing IDM normally..."
-Start-Process -FilePath $installerPath -NoNewWindow -Wait
-
-# Download the new IDMan.exe
+# Download the new IDMan.exe file
 Write-Host "Downloading new IDMan.exe..."
+$idmanExePath = "$idmFolderPath\IDMan.exe"
 Invoke-WebRequest -Uri $idmanExeUrl -OutFile $idmanExePath -UseBasicParsing
 
 # Download the registry file
 Write-Host "Downloading registry file..."
+$regFilePath = "$env:TEMP\DownloadManager.reg"
 Invoke-WebRequest -Uri $regFileUrl -OutFile $regFilePath -UseBasicParsing
 
 # Apply the registry file
 Write-Host "Applying registry settings..."
-Start-Process -FilePath "regedit.exe" -ArgumentList "/s $regFilePath" -NoNewWindow -Wait
+Start-Process -FilePath "regedit.exe" -ArgumentList "/s $regFilePath" -Wait
 
-# Cleanup
+# Cleanup temporary files
 Write-Host "Cleaning up temporary files..."
 Remove-Item -Path $installerPath, $regFilePath -Force
 
-Write-Host "Process completed!"
+Write-Host "Process completed successfully!"
