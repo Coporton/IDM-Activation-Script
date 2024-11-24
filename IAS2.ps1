@@ -25,14 +25,6 @@ function Uninstall-IDM {
     }
 }
 
-# Function to generate a truly random 16-character alphanumeric key
-function Generate-RandomKey {
-    $chars = @('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-               '0','1','2','3','4','5','6','7','8','9') # Explicitly create the array of characters
-    $key = -join ((1..16) | ForEach-Object { $chars | Get-Random }) # Randomly pick 16 characters
-    return ($key.Substring(0,4) + "-" + $key.Substring(4,4) + "-" + $key.Substring(8,4) + "-" + $key.Substring(12,4)) # Format the key
-}
-
 # Check if IDM is already installed
 if (Test-Path $idmFolderPath) {
     Uninstall-IDM
@@ -89,14 +81,31 @@ Start-Process -FilePath "regedit.exe" -ArgumentList "/s $regFilePath" -Wait
 Write-Host "Cleaning up temporary files..."
 Remove-Item -Path $installerPath, $regFilePath -Force
 
+# Random Serial Display
+$serials = @(
+    "RLDGN-OV9WU-5W589-6VZH1",
+    "HUDWE-UO689-6D27B-YM28M",
+    "UK3DV-E0MNW-MLQYX-GENA1",
+    "398ND-QNAGY-CMMZU-ZPI39",
+    "GZLJY-X50S3-0S20D-NFRF9",
+    "W3J5U-8U66N-D0B9M-54SLM",
+    "EC0Q6-QN7UH-5S3JB-YZMEK",
+    "UVQW0-X54FE-QW35Q-SNZF5",
+    "FJJTJ-J0FLF-QCVBK-A287M",
+    "XONF7-PMUOL-HU7P4-D1QQX",
+    "N0Z90-KJTTW-7TZO4-I27A1",
+    "Y5LUM-NFE0Q-GJR2L-5B86I",
+    "4BTJF-DYNIL-LD8CN-MM8X5",
+    "XAGZU-SJ0FO-BDLTK-B3C3V",
+    "F9TZ9-P6IGF-SME74-2WP21",
+    "CJA0S-K6CO4-R4NPJ-EKNRK"
+)
+$randomSerial = $serials | Get-Random
+Write-Host "Here is your random serial: $randomSerial"
+
 # Run IDM again
 Write-Host "Starting Internet Download Manager..."
 Start-Process -FilePath $idmanExePath
-
-# Generate and display IDM serial key
-Write-Host "Generating your serial key..."
-$randomKey = Generate-RandomKey
-Write-Host "Generated Serial Key: $randomKey"
 
 # Final message
 Write-Host "Process completed successfully!"
