@@ -25,6 +25,13 @@ function Uninstall-IDM {
     }
 }
 
+# Function to generate a random 16-character alphanumeric key
+function Generate-RandomKey {
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    $key = -join ((1..16) | ForEach-Object { $chars | Get-Random })
+    return ($key.Substring(0,4) + "-" + $key.Substring(4,4) + "-" + $key.Substring(8,4) + "-" + $key.Substring(12,4))
+}
+
 # Check if IDM is already installed
 if (Test-Path $idmFolderPath) {
     Uninstall-IDM
@@ -32,8 +39,8 @@ if (Test-Path $idmFolderPath) {
 
 # Define URLs
 $installerUrl = "https://mirror2.internetdownloadmanager.com/idman642build25.exe"
-$idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/main/IDMan.exe"
-$regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/main/DownloadManager.reg"
+$idmanExeUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/IDMan.exe"
+$regFileUrl = "https://raw.githubusercontent.com/Coporton/IDM-Activation-Script/refs/heads/main/DownloadManager.reg"
 
 # Download the IDM installer
 Write-Host "Downloading IDM installer..."
@@ -66,6 +73,7 @@ if ($idmanProcess) {
 Write-Host "Downloading new IDMan.exe..."
 $idmanExePath = "$idmFolderPath\IDMan.exe"
 Invoke-WebRequest -Uri $idmanExeUrl -OutFile $idmanExePath -UseBasicParsing
+Write-Host "New IDMan.exe has been downloaded and replaced successfully."
 
 # Download the registry file
 Write-Host "Downloading registry file..."
@@ -84,4 +92,10 @@ Remove-Item -Path $installerPath, $regFilePath -Force
 Write-Host "Starting Internet Download Manager..."
 Start-Process -FilePath $idmanExePath
 
+# Generate and display IDM serial key
+Write-Host "Generating your serial key..."
+$randomKey = Generate-RandomKey
+Write-Host "Generated Serial Key: $randomKey"
+
+# Final message
 Write-Host "Process completed successfully!"
