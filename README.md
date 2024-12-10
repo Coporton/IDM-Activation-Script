@@ -11,7 +11,7 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 
 ## 🛠️ **Installation**
 
-### **Method 1**
+### **Method 1 (Recommended)**
 1. **Open PowerShell**:
    - Right-click the Start menu and select **Windows PowerShell** or **Windows Terminal**.
    - If prompted by User Account Control (UAC), click **Yes** to allow PowerShell to run with administrative privileges.
