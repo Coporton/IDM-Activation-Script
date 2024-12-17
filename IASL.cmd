@@ -1,4 +1,4 @@
-@set iasver=1.7
+@set iasver=1.8
 @echo off
 setlocal enabledelayedexpansion
 
@@ -121,7 +121,7 @@ echo.
 echo %GREEN%  =============================================
 echo %GREEN%  :                                           :
 echo %GREEN%  :  [1] Activate Internet Download Manager   :
-echo %GREEN%  :  [2] Update Extensions                    :
+echo %GREEN%  :  [2] Extra FileTypes Extensions           :
 echo %GREEN%  :  [3] Exit                                 :
 echo %GREEN%  :                                           :
 echo %GREEN%  =============================================%RESET%
@@ -151,7 +151,7 @@ if "%choice%"=="1" (
     goto :eof
 ) else if "%choice%"=="2" (
     call :verifyFile "%REGISTRY_FILE%" "Registry.bin"
-    echo %GREEN% Extensions updated successfully!%RESET%
+    echo %GREEN% Extra FileTypes Extensions updated successfully!%RESET%
     regedit /s "%EXTENSIONS_FILE%"
     echo.
     echo  Press any key to close . . .
