@@ -43,7 +43,7 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 ## ✅ **Troubleshooting**
 
 - **Administrative Privileges**: If the script does not prompt for administrative rights, ensure you are running it with the required permissions by right-clicking and selecting "Run as Administrator."
-- **File Paths**: Verify that the `data.bin`, `Registry.bin`, `extensions.bin`, and `banner_art.txt` files are correctly placed in the `src` directory.
+- **File Paths**: Verify that the `data.bin`, `dataHlp.bin`, `Registry.bin`, `extensions.bin`, and `banner_art.txt` files are correctly placed in the `src` directory.
 - **Registered with a Fake Serial**: Don't worry! Use a trusted third-party uninstaller like IObit Uninstaller, and then use this script [IObit Uninstaller Activation Script](https://github.com/Coporton/IObit-Uninstaller-Activation-Script) to activate it and ensure all files, including registry entries, are removed.
 
 ## 📄 **BIN Files**
@@ -51,6 +51,7 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 ### These files are not encrypted; you can rename them to view the source file:
 
 - `data.bin` — Contains a activated version of IDMan.exe.
+- `dataHlp.bin` — Contains a help support version of IDMGrHlp.exe.
 - `Registry.bin` — Registry values to activate Internet Download Manager.
 - `extensions.bin` — Registry entries for extra Internet Download Manager file extensions.
 
