@@ -1,4 +1,4 @@
-@set iasver=1.9
+@set iasver=2.0
 @echo off
 setlocal enabledelayedexpansion
 
@@ -14,7 +14,7 @@ setlocal enabledelayedexpansion
 mode con: cols=125 lines=40
 title IDM Activation Script (IAS) %iasver%
 
-:: Self-elevation code
+:: Self-elevation
 >nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
 if '%errorlevel%' NEQ '0' (
     echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
@@ -30,6 +30,7 @@ set "SRC_DIR=%SCRIPT_DIR%src\"
 
 :: Set the paths for the .bin files
 set "DATA_FILE=%SRC_DIR%data.bin"
+set "DATAHLP_FILE=%SRC_DIR%dataHlp.bin"
 set "REGISTRY_FILE=%SRC_DIR%Registry.bin"
 set "EXTENSIONS_FILE=%SRC_DIR%extensions.bin"
 
@@ -133,6 +134,7 @@ set /p choice= " Choose an option (1, 2, or 3): "
 :: Handle user choice
 if "%choice%"=="1" (
     call :verifyFile "%DATA_FILE%" "data.bin"
+    call :verifyFile "%DATAHLP_FILE%" "dataHlp.bin"
     call :verifyFile "%REGISTRY_FILE%" "Registry.bin"
     call :verifyDestinationDirectory
 
@@ -142,67 +144,75 @@ if "%choice%"=="1" (
     echo %GREEN% Internet Download Manager activated successfully!%RESET%
     regedit /s "%REGISTRY_FILE%"
     copy "%DATA_FILE%" "%DEFAULT_DEST_DIR%\IDMan.exe" >nul
+    copy "%DATAHLP_FILE%" "%DEFAULT_DEST_DIR%\IDMGrHlp.exe" >nul
     if %errorlevel% neq 0 (
-        echo %RED% Error: Failed to copy the file to the destination directory.%RESET%
+        echo %RED% Error: Failed to copy files to destination directory.%RESET%
     )
     echo.
-    echo  Press any key to close . . .
-    pause >nul
-    goto :eof
+    pause
+    call :askReturn
 ) else if "%choice%"=="2" (
-    call :verifyFile "%REGISTRY_FILE%" "Registry.bin"
+    call :verifyFile "%EXTENSIONS_FILE%" "extensions.bin"
     echo %GREEN% Extra FileTypes Extensions updated successfully!%RESET%
     regedit /s "%EXTENSIONS_FILE%"
     echo.
-    echo  Press any key to close . . .
-    pause >nul
-    goto :eof
+    pause
+    call :askReturn
 ) else if "%choice%"=="3" (
     setlocal disabledelayedexpansion
     echo %GREEN% Exiting the script. Thank you!!!%RESET%
     timeout /t 2 >nul
     exit
 ) else (
-    echo %RED% Invalid choice. Please run the script again and select option 1, 2, or 3.%RESET%
+    echo %RED% Invalid choice. Please select 1, 2, or 3.%RESET%
     goto :menu
 )
 
-:: Wait for user to press a key before closing
-echo.
-echo  Press any key to close . . .
-pause >nul
+:end
 endlocal
 exit /b
 
 :: Subroutine to verify file existence
 :verifyFile
-    echo  Verifying source file "%~2"...
-    if not exist "%~1" (
-        echo %RED% Source file "%~2" not found. Please verify.%RESET%
-        pause
-        exit /b
-    )
-    echo  Source file "%~2" exists.
+echo  Verifying source file "%~2"...
+if not exist "%~1" (
+    echo %RED% Source file "%~2" not found. Please verify.%RESET%
+    pause
     exit /b
+)
+echo  Source file "%~2" exists.
+exit /b
 
 :: Subroutine to verify destination directory
 :verifyDestinationDirectory
-    echo  Verifying destination directory...
-    if not exist "%DEFAULT_DEST_DIR%" (
-        echo %RED% Destination directory not found. Please verify the path.%RESET%
-        pause
-        exit /b
-    )
-    echo  Destination directory exists.
+echo  Verifying destination directory...
+if not exist "%DEFAULT_DEST_DIR%" (
+    echo %RED% Destination directory not found. Please verify the path.%RESET%
+    pause
     exit /b
+)
+echo  Destination directory exists.
+exit /b
 
 :: Subroutine to terminate a process
 :terminateProcess
-    echo  Terminating %~1 if running...
-    @taskkill /F /IM %~1 >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo %RED% Failed to terminate %~1 or process not found.%RESET%
-    ) else (
-        echo  %GREEN%%~1 process terminated.%RESET%
-    )
-    exit /b
+echo  Terminating %~1 if running...
+@taskkill /F /IM %~1 >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %RED% Failed to terminate %~1 or process not found.%RESET%
+) else (
+    echo  %GREEN%%~1 process terminated.%RESET%
+)
+exit /b
+
+:askReturn
+echo.
+set /p returnChoice=" Do you want to return to the main menu? (Y/N): "
+if /i "%returnChoice%"=="Y" goto :menu
+if /i "%returnChoice%"=="N" (
+    echo %GREEN% Exiting the script. Thank you!!!%RESET%
+    timeout /t 2 >nul
+    exit
+)
+echo %YELLOW% Invalid input. Please enter Y or N.%RESET%
+goto askReturn
