@@ -3,7 +3,7 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\SOFTWARE\DownloadManager]
 "LstCheck"=""
 "radxcnt"=
-"idmvers"="v6.42b30 Full"
+"idmvers"="v6.42b32 Full"
 "FName"="Coporton"
 "LName"="WorkStation"
 "Email"="coporton@protonmail.com"
