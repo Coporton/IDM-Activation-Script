@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-set iasver=2.1.1
+set iasver=2.2.1
 
 ::============================================================================
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
@@ -28,6 +28,9 @@ set "REGISTRY_FILE=%SRC_DIR%registry.bin"
 set "EXTENSIONS_FILE=%SRC_DIR%extensions.bin"
 set "ascii_file=%SRC_DIR%banner_art.txt"
 
+:: Setup temp files
+set "tempfile=%SRC_DIR%idm_latest_version.txt"
+
 :: Output colors
 set "RESET=[0m"
 set "GREEN=[32m"
@@ -43,89 +46,121 @@ set "padding=   "
 for /f "delims=" %%i in (%ascii_file%) do (
     echo !padding!%%i
 )
-echo.
-echo.
 
-:: Check IDM installation directory from the registry
-for /f "tokens=2*" %%A in ('reg query "HKCU\SOFTWARE\DownloadManager" /v ExePath 2^>nul') do (
-    set "DEFAULT_DEST_DIR=%%B"
+echo.
+echo Getting the latest version information...
+timeout /t 1 >nul
+
+:: File ready - read version
+for /f "usebackq tokens=* delims=" %%v in ("%tempfile%") do set "online_raw=%%v"
+set "online_version=!online_raw:Latest IDM Version:=!"
+set "online_version=!online_version:~1!"
+echo %GREEN% Latest version: !online_version! %RESET%
+
+:: Parse online version and generate download URL
+for /f "tokens=1,2,4 delims=. " %%a in ("!online_version!") do (
+    set "o_major=%%a"
+    set "o_minor=%%b"
+    set "o_build=%%c"
 )
 
-:: Remove "IDMan.exe" from the path if found
-if defined DEFAULT_DEST_DIR (
-    for %%A in ("%DEFAULT_DEST_DIR%") do set "DEFAULT_DEST_DIR=%%~dpA"
-    timeout /t 1 >nul
-    echo %GREEN% Internet Download Manager found.%RESET%
+set "downloadcode="
+set "downloadcode=!o_major!!o_minor!build!o_build!"
+set "downloadurl=https://mirror2.internetdownloadmanager.com/idman%downloadcode%.exe"
+
+:: Check installed version
+echo Checking installed version...
+set "installed="
+for /f "tokens=3" %%a in ('reg query "HKCU\Software\DownloadManager" /v idmvers 2^>nul') do set "installed=%%a"
+if not defined installed (
+    for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Internet Download Manager" /v Version 2^>nul') do set "installed=%%a"
+)
+
+timeout /t 1 >nul
+if defined installed (
+    set "installed=!installed:v=!"
+    set "installed=!installed:Full=!"
+    set "installed=!installed: =!"
+    set "installed=!installed:b= Build !"
+    echo %GREEN% Internet Download Manager found. Installed version: !installed!%RESET%
 ) else (
     setlocal disabledelayedexpansion
     echo %RED% Error: Unable to find Internet Download Manager installation directory.%RESET%
-    echo %YELLOW% Please ensure Internet Download Manager is installed correctly. Then run this script again. Thank you!!!%RESET%
+    echo %YELLOW% Please ensure Internet Download Manager is installed correctly. Then run this script again.%RESET%
     echo.
-    echo %GREEN% You can download the latest version from here: https://www.internetdownloadmanager.com/download.html%RESET%
+    echo %GREEN% You can download the latest version from here: %downloadurl%%RESET%
     echo.
-    echo  Press any key to close . . .
-    pause >nul
-    exit
+    echo Loading Menu . . .
+    goto :menu
 )
 
-:: Output the IDM installed directory and version
-timeout /t 1 >nul
-echo %GREEN% Installed Directory: %DEFAULT_DEST_DIR%%RESET%
-
-:: Check IDM version from the registry
-for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Internet Download Manager" /v DisplayVersion 2^>nul') do (
-    set "IDM_VERSION=%%B"
+:: Parse installed version
+for /f "tokens=1,2,4 delims=. " %%a in ("!installed!") do (
+    set "i_major=%%a"
+    set "i_minor=%%b"
+    set "i_build=%%c"
 )
 
-if not defined IDM_VERSION (
-    for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Internet Download Manager" /v DisplayVersion 2^>nul') do (
-        set "IDM_VERSION=%%B"
-    )
+:: Compare versions
+set /a i_total = 10000 * !i_major! + 100 * !i_minor! + !i_build!
+set /a o_total = 10000 * !o_major! + 100 * !o_minor! + !o_build!
+
+echo.
+if !i_total! GEQ !o_total! (
+    echo %GREEN% You already have the latest version of Internet Download Manager.%RESET%
+) else (
+    echo %YELLOW% A newer version of IDM is available!%RESET%
+    echo %GREEN% Please update to the latest version: !online_version!%RESET%
 )
+echo.
 
-:: If the IDM version was not found, exit with error
-if not defined IDM_VERSION (
-    echo %RED% Error: Unable to retrieve the installed Internet Download Manager version. Please ensure Internet Download Manager is installed correctly.%RESET%
-    pause
-    exit /b
-)
-
-timeout /t 1 >nul
-echo %YELLOW% Installed Internet Download Manager Version: %IDM_VERSION%%RESET%
-timeout /t 1 >nul
-
-:: MENU
+:: Main menu
 :menu
-::cls
+timeout /t 1 >nul
 echo.
 echo %GREEN%  ======================================================
 echo %GREEN%    :                                                :
-echo %GREEN%    :  [1] Clean Previous IDM Registry Entries       :
-echo %GREEN%    :  [2] Activate Internet Download Manager        :
-echo %GREEN%    :  [3] Extra FileTypes Extensions                :
-echo %GREEN%    :  [4] Do Everything (1 + 2 + 3)                 :
-echo %GREEN%    :  [5] Exit                                      :
+echo %GREEN%    :  [1] Download Latest IDM Version               :
+echo %GREEN%    :  [2] Clean Previous IDM Registry Entries       :
+echo %GREEN%    :  [3] Activate Internet Download Manager        :
+echo %GREEN%    :  [4] Extra FileTypes Extensions                :
+echo %GREEN%    :  [5] Do Everything (3 + 4)                     :
+echo %GREEN%    :  [6] Exit                                      :
 echo %GREEN%    :                                                :
 echo %GREEN%  ======================================================%RESET%
 echo.
 set "choice="
-set /p choice=" Choose an option (1-5): "
+set /p choice=" Choose an option (1-6): "
 if not defined choice goto :menu
 
-if "%choice%"=="1" call :CleanRegistry & call :askReturn
-if "%choice%"=="2" call :ActivateIDM & call :askReturn
-if "%choice%"=="3" call :AddExtensions & call :askReturn
-if "%choice%"=="4" call :DoEverything & call :askReturn
-if "%choice%"=="5" call :quit
+if "%choice%"=="1" call :DownloadLatestIDM & goto :menu
+if "%choice%"=="2" call :CleanRegistry & goto :menu
+if "%choice%"=="3" call :ActivateIDM & goto :menu
+if "%choice%"=="4" call :AddExtensions & goto :menu
+if "%choice%"=="5" call :DoEverything & goto :menu
+if "%choice%"=="6" call :quit
 
-:: If the input was invalid (not 1-5), re-prompt
-echo %RED% Invalid option. Please enter a number from 1 to 5.%RESET%
+echo %RED% Invalid option. Please enter a number from 1 to 6.%RESET%
 timeout /t 2 >nul
 goto :menu
 
 ::----------------------
+:DownloadLatestIDM
+if /i "!online_version!"=="Unknown" (
+    echo %RED% No version info available. Try checking for updates first.%RESET%
+    exit /b
+)
+echo %GREEN% Opening your browser to download the latest IDM...%RESET%
+echo.
+start "" "%downloadurl%"
+echo %YELLOW% If your download does not start automatically, copy and paste this URL into your browser:%RESET%
+echo.
+exit /b
+
+::----------------------
 :CleanRegistry
 :: Full registry cleaning logic
+
 call :terminateProcess "IDMan.exe"
 echo %YELLOW% Cleaning IDM-related Registry Entries...%RESET%
 
@@ -190,8 +225,8 @@ for %%k in (
     "HKCU\Software\Wow6432Node\Download Manager"
 ) do reg delete %%k /f >nul 2>&1
 
-:: Clean license values (if present)
-for %%v in ("FName" "LName" "Email" "Serial" "CheckUpdtVM" "tvfrdt" "LstCheck" "scansk") do (
+:: Clean license values
+for %%v in ("FName" "LName" "Email" "Serial" "CheckUpdtVM" "tvfrdt" "LstCheck" "scansk" "idmvers") do (
     reg delete "HKCU\Software\DownloadManager" /v %%v /f >nul 2>&1
 )
 
@@ -204,6 +239,24 @@ exit /b
 
 ::----------------------
 :ActivateIDM
+:: Check IDM installation directory from the registry
+
+for /f "tokens=2*" %%A in ('reg query "HKCU\SOFTWARE\DownloadManager" /v ExePath 2^>nul') do (
+    set "DEFAULT_DEST_DIR=%%B"
+)
+
+if defined DEFAULT_DEST_DIR (
+    for %%A in ("%DEFAULT_DEST_DIR%") do set "DEFAULT_DEST_DIR=%%~dpA"
+    timeout /t 1 >nul
+) else (
+    setlocal disabledelayedexpansion
+    echo %RED% Error: Unable to find IDM installation directory.%RESET%
+    echo %YELLOW% Please install IDM and try again.%RESET%
+    echo %GREEN% Download it here: !downloadurl!%RESET%
+    pause
+    exit /b
+)
+
 call :verifyFile "%DATA_FILE%" "data.bin"
 call :verifyFile "%DATAHLP_FILE%" "dataHlp.bin"
 call :verifyFile "%REGISTRY_FILE%" "registry.bin"
@@ -235,12 +288,11 @@ exit /b
 
 ::----------------------
 :DoEverything
-call :CleanRegistry
 call :ActivateIDM
 call :AddExtensions
 echo.
 echo [%DATE% %TIME%] Activated IDM >> %SCRIPT_DIR%log.txt
-echo %GREEN% Congratulations. All tasks completed successfully.!%RESET%
+echo %GREEN% Congratulations. All tasks completed successfully!%RESET%
 echo.
 exit /b
 
@@ -248,20 +300,15 @@ exit /b
 :askReturn
 set /p back=" Return to main menu? (Y/N): "
 if not defined back goto :askReturn
-
-if /i "%back%"=="Y" (
-    set "choice="
-    goto :menu
-)
+if /i "%back%"=="Y" set "choice=" & goto :menu
 if /i "%back%"=="N" call :quit
 
 echo %RED% Invalid input. Please type Y or N.%RESET%
-set "choice="  :: 💡 Clear choice before looping
 goto :askReturn
 
 ::----------------------
 :quit
 echo.
-echo %GREEN% Thank you for using Coporton IDM Activation Script. Exiting...%RESET%
+echo %GREEN% Thank you for using Coporton IDM Activation Script. Have a great day... %RESET%
 timeout /t 2 >nul
 exit
