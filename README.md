@@ -32,16 +32,19 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 ## 💻 **Usage**
 
 ### 1. Run the Script:
-- Double-click on `IAS.cmd` to execute it. The script will automatically request administrative privileges if needed, so you no longer need to manually select "Run as Administrator."
+- Double-click on `IASL.cmd` to execute it. The script will automatically request administrative privileges if needed, so you no longer need to manually select "Run as Administrator."
 - If prompted by User Account Control (UAC), click **Yes** to grant the necessary permissions.
 - Once elevated, the script will continue running with the appropriate permissions for file operations.
 
 ### 2. Follow the On-Screen Instructions:
 - Choose an option from the menu:
-  - `1` to activate Internet Download Manager.
-  - `2` to activate Extra-FileType_Extensions.
-  - `3` to exit.
-- If you select `1`, the script will copy the necessary files to the appropriate directory and provide feedback on the operation status.
+  - `1` to Download Latest IDM Version.
+  - `2` Clean Previous IDM Registry Entries.
+  - `3` to Activate Internet Download Manager.
+  - `4` to Extra FileTypes Extensions.
+  - `5` to Do Everything (3 + 4).
+  - `6` to exit.
+- If you select `5`, the script will copy the necessary files to the appropriate directory and provide feedback on the operation status.
 
 ## ✅ **Troubleshooting**
 
@@ -53,10 +56,10 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 
 ### These files are not encrypted; you can rename them to view the source file:
 
-- `data.bin` — Contains a activated version of IDMan.exe.
-- `dataHlp.bin` — Contains a help support version of IDMGrHlp.exe.
-- `Registry.bin` — Registry values to activate Internet Download Manager.
-- `extensions.bin` — Registry entries for extra Internet Download Manager file extensions.
+- `data.bin` - Contains a activated version of IDMan.exe.
+- `dataHlp.bin` - Contains a help support version of IDMGrHlp.exe.
+- `Registry.bin` - Registry values to activate Internet Download Manager.
+- `extensions.bin` - Registry entries for extra Internet Download Manager file extensions.
 
 ## 📜 **License**
 
@@ -64,7 +67,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## ℹ️ **Acknowledgments**
 
-- Special thanks to oop7, who was instrumental in this script's functionality.
+- Special thanks to AI, that was instrumental in this script's functionality.
 
 ## ❓ **Contact**
 
