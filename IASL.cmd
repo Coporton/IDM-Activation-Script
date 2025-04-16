@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-set iasver=2.2.1
+set iasver=2.3.1
 
 ::============================================================================
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
@@ -28,8 +28,8 @@ set "REGISTRY_FILE=%SRC_DIR%registry.bin"
 set "EXTENSIONS_FILE=%SRC_DIR%extensions.bin"
 set "ascii_file=%SRC_DIR%banner_art.txt"
 
-:: Setup temp files
-set "tempfile=%SRC_DIR%idm_latest_version.txt"
+:: Temp files
+set "tempfile_html=%temp%\idm_news.html"
 
 :: Output colors
 set "RESET=[0m"
@@ -49,22 +49,33 @@ for /f "delims=" %%i in (%ascii_file%) do (
 
 echo.
 echo Getting the latest version information...
-timeout /t 1 >nul
+curl -s "https://www.internetdownloadmanager.com/news.html" -o "%tempfile_html%"
+set "online_version="
 
-:: File ready - read version
-for /f "usebackq tokens=* delims=" %%v in ("%tempfile%") do set "online_raw=%%v"
-set "online_version=!online_raw:Latest IDM Version:=!"
-set "online_version=!online_version:~1!"
+:: Find the first occurrence of the version
+for /f "tokens=1* delims=<>" %%a in ('findstr /i "<H3>What's new in version" "%tempfile_html%" ^| findstr /r /c:"Build [0-9]*"') do (
+    set "line=%%b"
+    set "line=!line:What's new in version =!"
+    set "line=!line:</H3>=!"
+    set "online_version=!line!"
+    goto :got_version
+)
+
+:got_version
+if not defined online_version (
+    echo %RED% Failed to retrieve online version.%RESET%
+    exit /b
+)
+
 echo %GREEN% Latest version: !online_version! %RESET%
 
-:: Parse online version and generate download URL
+:: Scan the online version and generate the download code
 for /f "tokens=1,2,4 delims=. " %%a in ("!online_version!") do (
     set "o_major=%%a"
     set "o_minor=%%b"
     set "o_build=%%c"
 )
 
-set "downloadcode="
 set "downloadcode=!o_major!!o_minor!build!o_build!"
 set "downloadurl=https://mirror2.internetdownloadmanager.com/idman%downloadcode%.exe"
 
@@ -113,6 +124,9 @@ if !i_total! GEQ !o_total! (
     echo %GREEN% Please update to the latest version: !online_version!%RESET%
 )
 echo.
+
+:: Limpeza
+del "%tempfile_html%" >nul 2>&1
 
 :: Main menu
 :menu
