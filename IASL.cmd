@@ -125,7 +125,7 @@ if !i_total! GEQ !o_total! (
 )
 echo.
 
-:: Limpeza
+:: Cleaning
 del "%tempfile_html%" >nul 2>&1
 
 :: Main menu
