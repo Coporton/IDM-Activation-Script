@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-set iasver=2.3.3
+set iasver=2.4.0
 
 ::============================================================================
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
@@ -50,6 +50,67 @@ for /f "delims=" %%i in (%ascii_file%) do (
 :: Call internet connection check
 call :check_internet
 
+:: Verify Script Version
+echo Checking for script updates...
+
+set "SCRIPT_VERSION=v%iasver%"
+set "API_URL=https://api.github.com/repos/coporton/IDM-Activation-Script/releases/latest"
+
+curl -s "%API_URL%" -o "%temp%\latest_release.json"
+
+:: Verify that the JSON file was downloaded correctly
+if not exist "%temp%\latest_release.json" (
+    echo Failed to download release information from GitHub.
+    pause
+    exit /B
+)
+
+set "LATEST_VERSION="
+
+:: Processing the JSON file
+for /f "tokens=1,* delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
+    set "line=%%b"
+    set "line=!line:~2!"      :: Remove espaços e aspas iniciais
+    set "line=!line:~0,-2!"    :: Remove aspas finais
+    set "line=!line: =!"       :: Remove espaços extras
+
+    set "LATEST_VERSION=!line:v.=v!"
+)
+
+if not defined LATEST_VERSION (
+    echo Failed to extract version from the release information.
+    pause
+    exit /B
+)
+
+:: Comparing script versions
+if /i "%SCRIPT_VERSION%"=="%LATEST_VERSION%" (
+    echo %GREEN% Your script is up-to-date. Version: %SCRIPT_VERSION% %RESET%
+    goto continue_script
+)
+
+echo %GREEN% A new script version is available! %RESET%
+echo Current version: %SCRIPT_VERSION%
+echo Latest version : %LATEST_VERSION%
+
+:: Download Question
+echo %GREEN% ========================================================================
+echo %GREEN%    :                                                                :
+echo %GREEN%    :  Do you want to download the latest version of the script?     : 
+echo %GREEN%    :                       (1 = Yes / 2 = No)                       :
+echo %GREEN% =======================================================================%RESET%
+echo.
+
+set "choice="
+set /p choice=" Choose an option (1 = Yes / 2 = No): "
+
+if "%choice%"=="1" (
+    call :DownloadLatestScript
+) else (
+call :continue_script
+)
+
+:continue_script
 echo Getting the latest version information...
 curl -s "https://www.internetdownloadmanager.com/news.html" -o "%tempfile_html%"
 set "online_version="
@@ -129,6 +190,7 @@ echo.
 
 :: Cleaning
 del "%tempfile_html%" >nul 2>&1
+del "%temp%\latest_release.json" >nul 2>&1
 
 :: Main menu
 :menu
@@ -159,6 +221,32 @@ if "%choice%"=="6" call :quit
 echo %RED% Invalid option. Please enter a number from 1 to 6.%RESET%
 timeout /t 2 >nul
 goto :menu
+
+::----------------------
+:: Download function for the latest script
+:DownloadLatestScript
+set "DOWNLOAD_URL="
+
+:: Extract download URL from JSON file
+for /f "tokens=1,* delims=:" %%a in ('findstr /i "browser_download_url" "%temp%\latest_release.json"') do (
+    set "line=%%b"
+    set "line=!line:~2!"      :: Remove espaços e aspas iniciais
+    set "line=!line: =!"       :: Remove espaços extras
+    set "line=!line:~0,-1!"    :: Remove o último caractere de aspas, se houver
+    set "DOWNLOAD_URL=!line!"
+)
+
+:: Verify that the download URL was extracted correctly
+if not "!DOWNLOAD_URL!"=="" (
+    echo %GREEN% Opening your browser to download the latest script...%RESET%
+    echo.
+    start "" "!DOWNLOAD_URL!"
+    echo %YELLOW% If your download does not start automatically, copy and paste this URL into your browser:%RESET%
+    echo %YELLOW% !DOWNLOAD_URL!%RESET%
+) else (
+    echo %RED% Failed to retrieve download URL.%RESET%
+)
+exit
 
 ::----------------------
 :DownloadLatestIDM
