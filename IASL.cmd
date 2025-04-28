@@ -70,9 +70,9 @@ set "LATEST_VERSION="
 :: Processing the JSON file
 for /f "tokens=1,* delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
     set "line=%%b"
-    set "line=!line:~2!"      :: Remove espaços e aspas iniciais
-    set "line=!line:~0,-2!"    :: Remove aspas finais
-    set "line=!line: =!"       :: Remove espaços extras
+    set "line=!line:~2!"
+    set "line=!line:~0,-2!"
+    set "line=!line: =!"
 
     set "LATEST_VERSION=!line:v.=v!"
 )
