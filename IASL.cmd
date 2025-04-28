@@ -234,9 +234,9 @@ set "DOWNLOAD_URL="
 :: Extract download URL from JSON file
 for /f "tokens=1,* delims=:" %%a in ('findstr /i "browser_download_url" "%temp%\latest_release.json"') do (
     set "line=%%b"
-    set "line=!line:~2!"      :: Remove espaços e aspas iniciais
-    set "line=!line: =!"       :: Remove espaços extras
-    set "line=!line:~0,-1!"    :: Remove o último caractere de aspas, se houver
+    set "line=!line:~2!"
+    set "line=!line: =!"
+    set "line=!line:~0,-1!"
     set "DOWNLOAD_URL=!line!"
 )
 
