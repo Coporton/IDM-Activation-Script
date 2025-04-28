@@ -47,7 +47,9 @@ for /f "delims=" %%i in (%ascii_file%) do (
     echo !padding!%%i
 )
 
-echo.
+:: Call internet connection check
+call :check_internet
+
 echo Getting the latest version information...
 curl -s "https://www.internetdownloadmanager.com/news.html" -o "%tempfile_html%"
 set "online_version="
@@ -160,6 +162,9 @@ goto :menu
 
 ::----------------------
 :DownloadLatestIDM
+:: Call internet connection check
+call :check_internet
+
 if /i "!online_version!"=="Unknown" (
     echo %RED% No version info available. Try checking for updates first.%RESET%
     exit /b
@@ -169,6 +174,21 @@ echo.
 start "" "%downloadurl%"
 echo %YELLOW% If your download does not start automatically, copy and paste this URL into your browser:%RESET%
 echo.
+exit /b
+
+::----------------------
+:check_internet
+:: Call internet connection check
+echo.
+echo Checking internet connection...
+
+ping -n 2 www.google.com >nul 2>&1
+if errorlevel 1 (
+    echo %RED% No internet connection detected. Please check your connection.%RESET%
+    exit /b
+)
+
+echo %GREEN% Internet connection OK.%RESET%
 exit /b
 
 ::----------------------
