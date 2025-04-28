@@ -47,7 +47,7 @@ for /f "delims=" %%i in (%ascii_file%) do (
     echo !padding!%%i
 )
 
-:: Call internet connection check
+:: internet connection check
 call :check_internet
 
 :: Verify Script Version
@@ -93,7 +93,7 @@ echo %GREEN% A new script version is available! %RESET%
 echo Current version: %SCRIPT_VERSION%
 echo Latest version : %LATEST_VERSION%
 
-:: Download Question
+:ask_download
 echo %GREEN% ========================================================================
 echo %GREEN%    :                                                                :
 echo %GREEN%    :  Do you want to download the latest version of the script?     : 
@@ -106,8 +106,12 @@ set /p choice=" Choose an option (1 = Yes / 2 = No): "
 
 if "%choice%"=="1" (
     call :DownloadLatestScript
+) else if "%choice%"=="2" (
+    call :continue_script
 ) else (
-call :continue_script
+    echo %RED% Invalid input. Please type 1 or 2 only.%RESET%
+    timeout /t 2 >nul
+    goto ask_download
 )
 
 :continue_script
@@ -250,7 +254,6 @@ exit
 
 ::----------------------
 :DownloadLatestIDM
-:: Call internet connection check
 call :check_internet
 
 if /i "!online_version!"=="Unknown" (
@@ -266,7 +269,7 @@ exit /b
 
 ::----------------------
 :check_internet
-:: Call internet connection check
+:: internet connection check
 echo.
 echo Checking internet connection...
 
