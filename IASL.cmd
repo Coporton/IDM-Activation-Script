@@ -6,7 +6,7 @@ set iasver=2.4.0
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
 ::============================================================================
 
-mode con: cols=135 lines=40
+mode con: cols=120 lines=40
 title Coporton IDM Activation Script (Activator + Registry Cleaner) v%iasver%
 
 :: Ensure Admin Privileges
@@ -47,7 +47,7 @@ for /f "delims=" %%i in (%ascii_file%) do (
     echo !padding!%%i
 )
 
-:: internet connection check
+:: Internet connection check
 call :check_internet
 
 :: Verify Script Version
@@ -65,17 +65,13 @@ if not exist "%temp%\latest_release.json" (
     exit /B
 )
 
-setlocal enabledelayedexpansion
+:: Extract LATEST_VERSION from JSON
 set "LATEST_VERSION="
-
-:: Extracting the latest version from the JSON file
 for /f "tokens=2 delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
     set "line=%%a"
     set "line=!line:~2,-2!"
-    set "LATEST_VERSION=!line!"
+    for /f "delims=" %%v in ("!line!") do set "LATEST_VERSION=%%v"
 )
-
-endlocal & set "LATEST_VERSION=%LATEST_VERSION%"
 
 if not defined LATEST_VERSION (
     echo Failed to extract version from the release information.
@@ -83,16 +79,55 @@ if not defined LATEST_VERSION (
     exit /B
 )
 
-:: Comparing script versions (ignoring case)
-if /i "%SCRIPT_VERSION%"=="%LATEST_VERSION%" (
+:: Strip 'v' prefix for numeric comparison
+set "SCRIPT_VERSION_NUM=%SCRIPT_VERSION:v=%"
+set "LATEST_VERSION_NUM=%LATEST_VERSION:v=%"
+
+:: Compare Versions
+call :CompareVersions "%SCRIPT_VERSION_NUM%" "%LATEST_VERSION_NUM%"
+
+if "%is_newer%"=="1" (
+    echo %GREEN% A new script version is available! %RESET%
+    echo Current version: %SCRIPT_VERSION%
+    echo Latest version : %LATEST_VERSION%
+    goto ask_download
+) else (
     echo %GREEN% Your script is up-to-date. Version: %SCRIPT_VERSION% %RESET%
     goto continue_script
 )
 
-echo %GREEN% A new script version is available! %RESET%
-echo Current version: %SCRIPT_VERSION%
-echo Latest version : %LATEST_VERSION%
+::--------------------------
+:: Version Comparison Logic
+::--------------------------
+:CompareVersions
+setlocal EnableDelayedExpansion
+set "current=%~1"
+set "latest=%~2"
 
+for /f "tokens=1-3 delims=." %%a in ("!current!") do (
+    set "cur1=%%a"
+    set "cur2=%%b"
+    set "cur3=%%c"
+)
+for /f "tokens=1-3 delims=." %%a in ("!latest!") do (
+    set "lat1=%%a"
+    set "lat2=%%b"
+    set "lat3=%%c"
+)
+
+if !lat1! GTR !cur1! (endlocal & set "is_newer=1" & exit /b)
+if !lat1! LSS !cur1! (endlocal & set "is_newer=0" & exit /b)
+if !lat2! GTR !cur2! (endlocal & set "is_newer=1" & exit /b)
+if !lat2! LSS !cur2! (endlocal & set "is_newer=0" & exit /b)
+if !lat3! GTR !cur3! (endlocal & set "is_newer=1" & exit /b)
+if !lat3! LSS !cur3! (endlocal & set "is_newer=0" & exit /b)
+
+endlocal & set "is_newer=0"
+exit /b
+
+::--------------------------
+:: Ask to download new version
+::--------------------------
 :ask_download
 echo %GREEN% ========================================================================
 echo %GREEN%    :                                                                :
@@ -107,12 +142,13 @@ set /p choice=" Choose an option (1 = Yes / 2 = No): "
 if "%choice%"=="1" (
     call :DownloadLatestScript
 ) else if "%choice%"=="2" (
-    call :continue_script
+    goto continue_script
 ) else (
     echo %RED% Invalid input. Please type 1 or 2 only.%RESET%
     timeout /t 2 >nul
     goto ask_download
 )
+goto :eof
 
 :continue_script
 echo Getting the latest version information...
@@ -268,18 +304,15 @@ echo.
 exit /b
 
 ::----------------------
+:: Internet check subroutine
 :check_internet
-:: internet connection check
-echo.
-echo Checking internet connection...
-
-ping -n 2 www.google.com >nul 2>&1
+echo Checking internet connectivity...
+ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
-    echo %RED% No internet connection detected. Please check your connection.%RESET%
+    echo %RED% Internet not available. Please check your connection.%RESET%
+    pause
     exit /b
 )
-
-echo %GREEN% Internet connection OK.%RESET%
 exit /b
 
 ::----------------------
