@@ -65,17 +65,17 @@ if not exist "%temp%\latest_release.json" (
     exit /B
 )
 
+setlocal enabledelayedexpansion
 set "LATEST_VERSION="
 
-:: Processing the JSON file
-for /f "tokens=1,* delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
-    set "line=%%b"
-    set "line=!line:~2!"
-    set "line=!line:~0,-2!"
-    set "line=!line: =!"
-
-    set "LATEST_VERSION=!line:v.=v!"
+:: Extracting the latest version from the JSON file
+for /f "tokens=2 delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
+    set "line=%%a"
+    set "line=!line:~2,-2!"
+    set "LATEST_VERSION=!line!"
 )
+
+endlocal & set "LATEST_VERSION=%LATEST_VERSION%"
 
 if not defined LATEST_VERSION (
     echo Failed to extract version from the release information.
@@ -83,7 +83,7 @@ if not defined LATEST_VERSION (
     exit /B
 )
 
-:: Comparing script versions
+:: Comparing script versions (ignoring case)
 if /i "%SCRIPT_VERSION%"=="%LATEST_VERSION%" (
     echo %GREEN% Your script is up-to-date. Version: %SCRIPT_VERSION% %RESET%
     goto continue_script
