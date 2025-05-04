@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-set iasver=2.4.0
+set iasver=2.5.0
 
 ::============================================================================
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
@@ -239,10 +239,10 @@ echo.
 echo %GREEN%  ======================================================
 echo %GREEN%    :                                                :
 echo %GREEN%    :  [1] Download Latest IDM Version               :
-echo %GREEN%    :  [2] Clean Previous IDM Registry Entries       :
-echo %GREEN%    :  [3] Activate Internet Download Manager        :
-echo %GREEN%    :  [4] Extra FileTypes Extensions                :
-echo %GREEN%    :  [5] Do Everything (3 + 4)                     :
+echo %GREEN%    :  [2] Activate Internet Download Manager        :
+echo %GREEN%    :  [3] Extra FileTypes Extensions                :
+echo %GREEN%    :  [4] Do Everything (2 + 3)                     :
+echo %RED%    :  [5] Completely Remove IDM Registry Entries    :
 echo %GREEN%    :  [6] Exit                                      :
 echo %GREEN%    :                                                :
 echo %GREEN%  ======================================================%RESET%
@@ -252,10 +252,10 @@ set /p choice=" Choose an option (1-6): "
 if not defined choice goto :menu
 
 if "%choice%"=="1" call :DownloadLatestIDM & goto :menu
-if "%choice%"=="2" call :CleanRegistry & goto :menu
-if "%choice%"=="3" call :ActivateIDM & goto :menu
-if "%choice%"=="4" call :AddExtensions & goto :menu
-if "%choice%"=="5" call :DoEverything & goto :menu
+if "%choice%"=="2" call :ActivateIDM & goto :menu
+if "%choice%"=="3" call :AddExtensions & goto :menu
+if "%choice%"=="4" call :DoEverything & goto :menu
+if "%choice%"=="5" call :CleanRegistry & goto :menu
 if "%choice%"=="6" call :quit
 
 echo %RED% Invalid option. Please enter a number from 1 to 6.%RESET%
@@ -314,6 +314,91 @@ if errorlevel 1 (
     exit /b
 )
 exit /b
+
+::----------------------
+:ActivateIDM
+:: Check IDM installation directory from the registry
+
+for /f "tokens=2*" %%A in ('reg query "HKCU\SOFTWARE\DownloadManager" /v ExePath 2^>nul') do (
+    set "DEFAULT_DEST_DIR=%%B"
+)
+
+if defined DEFAULT_DEST_DIR (
+    for %%A in ("%DEFAULT_DEST_DIR%") do set "DEFAULT_DEST_DIR=%%~dpA"
+    timeout /t 1 >nul
+) else (
+    setlocal disabledelayedexpansion
+    echo %RED% Error: Unable to find IDM installation directory.%RESET%
+    echo %YELLOW% Please install IDM and try again.%RESET%
+    echo %GREEN% Download it here: !downloadurl!%RESET%
+    pause
+    exit /b
+)
+
+call :verifyFile "%DATA_FILE%" "data.bin"
+call :verifyFile "%DATAHLP_FILE%" "dataHlp.bin"
+call :verifyFile "%REGISTRY_FILE%" "registry.bin"
+call :verifyDestinationDirectory
+call :terminateProcess "IDMan.exe"
+regedit /s "%REGISTRY_FILE%"
+copy "%DATA_FILE%" "%DEFAULT_DEST_DIR%IDMan.exe" >nul
+copy "%DATAHLP_FILE%" "%DEFAULT_DEST_DIR%IDMGrHlp.exe" >nul
+
+:: ——— PROMPT FOR USER INPUT ———
+echo.
+SET /P FName=Enter your First Name: 
+SET /P LName=Enter your Last Name: 
+echo.
+
+:: ——— FALLBACK TO DEFAULTS IF BLANK ———
+if "%FName%"=="" set "FName=Coporton"
+if "%LName%"=="" set "LName=WorkStation"
+
+:: Re-register user info using the values the user just entered
+reg add "HKCU\SOFTWARE\DownloadManager" /v FName /t REG_SZ /d "%FName%" /f >nul
+reg add "HKCU\SOFTWARE\DownloadManager" /v LName /t REG_SZ /d "%LName%" /f >nul
+
+echo %GREEN% Internet Download Manager Activated.%RESET%
+exit /b
+
+:verifyFile
+if not exist "%~1" echo %RED% Missing: %~2%RESET% & pause & exit /b
+exit /b
+
+:verifyDestinationDirectory
+if not exist "%DEFAULT_DEST_DIR%" echo %RED% Destination not found.%RESET% & pause & exit /b
+exit /b
+
+:terminateProcess
+taskkill /F /IM %~1 >nul 2>&1
+exit /b
+
+::----------------------
+:AddExtensions
+regedit /s "%EXTENSIONS_FILE%"
+echo %GREEN% Extra FileTypes Extensions updated.%RESET%
+exit /b
+
+::----------------------
+:DoEverything
+call :ActivateIDM
+call :AddExtensions
+echo.
+echo [%DATE% %TIME%] Activated IDM >> %SCRIPT_DIR%log.txt
+echo %GREEN% Congratulations. All tasks completed successfully!%RESET%
+echo.
+exit /b
+
+::----------------------
+:askReturn
+set /p back=" Return to main menu? (Y/N): "
+if not defined back goto :askReturn
+if /i "%back%"=="Y" set "choice=" & goto :menu
+if /i "%back%"=="N" call :quit
+
+echo %RED% Invalid input. Please type Y or N.%RESET%
+goto :askReturn
+
 
 ::----------------------
 :CleanRegistry
@@ -388,81 +473,8 @@ for %%v in ("FName" "LName" "Email" "Serial" "CheckUpdtVM" "tvfrdt" "LstCheck" "
     reg delete "HKCU\Software\DownloadManager" /v %%v /f >nul 2>&1
 )
 
-:: Re-register user info
-reg add "HKCU\SOFTWARE\DownloadManager" /v FName /t REG_SZ /d Coporton /f >nul
-reg add "HKCU\SOFTWARE\DownloadManager" /v LName /t REG_SZ /d WorkStation /f >nul
-
 echo %GREEN% Registry cleanup completed.%RESET%
 exit /b
-
-::----------------------
-:ActivateIDM
-:: Check IDM installation directory from the registry
-
-for /f "tokens=2*" %%A in ('reg query "HKCU\SOFTWARE\DownloadManager" /v ExePath 2^>nul') do (
-    set "DEFAULT_DEST_DIR=%%B"
-)
-
-if defined DEFAULT_DEST_DIR (
-    for %%A in ("%DEFAULT_DEST_DIR%") do set "DEFAULT_DEST_DIR=%%~dpA"
-    timeout /t 1 >nul
-) else (
-    setlocal disabledelayedexpansion
-    echo %RED% Error: Unable to find IDM installation directory.%RESET%
-    echo %YELLOW% Please install IDM and try again.%RESET%
-    echo %GREEN% Download it here: !downloadurl!%RESET%
-    pause
-    exit /b
-)
-
-call :verifyFile "%DATA_FILE%" "data.bin"
-call :verifyFile "%DATAHLP_FILE%" "dataHlp.bin"
-call :verifyFile "%REGISTRY_FILE%" "registry.bin"
-call :verifyDestinationDirectory
-call :terminateProcess "IDMan.exe"
-regedit /s "%REGISTRY_FILE%"
-copy "%DATA_FILE%" "%DEFAULT_DEST_DIR%IDMan.exe" >nul
-copy "%DATAHLP_FILE%" "%DEFAULT_DEST_DIR%IDMGrHlp.exe" >nul
-echo %GREEN% Internet Download Manager Activated.%RESET%
-exit /b
-
-:verifyFile
-if not exist "%~1" echo %RED% Missing: %~2%RESET% & pause & exit /b
-exit /b
-
-:verifyDestinationDirectory
-if not exist "%DEFAULT_DEST_DIR%" echo %RED% Destination not found.%RESET% & pause & exit /b
-exit /b
-
-:terminateProcess
-taskkill /F /IM %~1 >nul 2>&1
-exit /b
-
-::----------------------
-:AddExtensions
-regedit /s "%EXTENSIONS_FILE%"
-echo %GREEN% Extra FileTypes Extensions updated.%RESET%
-exit /b
-
-::----------------------
-:DoEverything
-call :ActivateIDM
-call :AddExtensions
-echo.
-echo [%DATE% %TIME%] Activated IDM >> %SCRIPT_DIR%log.txt
-echo %GREEN% Congratulations. All tasks completed successfully!%RESET%
-echo.
-exit /b
-
-::----------------------
-:askReturn
-set /p back=" Return to main menu? (Y/N): "
-if not defined back goto :askReturn
-if /i "%back%"=="Y" set "choice=" & goto :menu
-if /i "%back%"=="N" call :quit
-
-echo %RED% Invalid input. Please type Y or N.%RESET%
-goto :askReturn
 
 ::----------------------
 :quit
