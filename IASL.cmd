@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-set iasver=2.5.2
+set iasver=2.5.3
 
 ::============================================================================
 :: Coporton IDM Activation Script (Activator + Registry Cleaner)
