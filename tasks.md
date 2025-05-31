@@ -32,12 +32,6 @@ The script is Windows-specific. Recommended technologies are:
 *   **Python with Tkinter/CustomTkinter:**
     *   **Pros:** Cross-platform (though script logic is Windows-specific), relatively easy to learn, good for scripting tasks, CustomTkinter provides modern themes. PyInstaller can bundle it into an `.exe`.
     *   **Cons:** May require users to have Python or include a larger bundled executable.
-*   **C# with Windows Forms (WinForms) or WPF:**
-    *   **Pros:** Native Windows look and feel, excellent integration with Windows APIs, Visual Studio provides good tooling.
-    *   **Cons:** Primarily Windows-only (which aligns with the script's target). WPF has a steeper learning curve than WinForms.
-
-The developer should choose based on familiarity and project needs. The core logic implementation will be similar regardless of the choice.
-
 ## 3. Design the User Interface (UI) and User Experience (UX)
 
 *   **Layout:** Single, simple window.
