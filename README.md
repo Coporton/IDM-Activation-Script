@@ -1,3 +1,5 @@
+
+it has not worked.....
 # **IDM Activation Script (Activator + Registry Cleaner)**
 
 IDM Activation Script is a tool designed to activate Internet Download Manager (IDM) for free, allowing users to bypass trial period restrictions and enjoy the full version without purchasing a license.
