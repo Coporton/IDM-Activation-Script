@@ -50,107 +50,6 @@ for /f "delims=" %%i in (%ascii_file%) do (
 :: Internet connection check
 call :check_internet
 
-:: Verify Script Version
-echo Checking for script updates...
-
-set "SCRIPT_VERSION=v%iasver%"
-set "API_URL=https://api.github.com/repos/coporton/IDM-Activation-Script/releases/latest"
-
-curl -s "%API_URL%" -o "%temp%\latest_release.json"
-
-:: Verify that the JSON file was downloaded correctly
-if not exist "%temp%\latest_release.json" (
-    echo Failed to download release information from GitHub.
-    pause
-    exit /B
-)
-
-:: Extract LATEST_VERSION from JSON
-set "LATEST_VERSION="
-for /f "tokens=2 delims=:" %%a in ('findstr /i "tag_name" "%temp%\latest_release.json"') do (
-    set "line=%%a"
-    set "line=!line:~2,-2!"
-    for /f "delims=" %%v in ("!line!") do set "LATEST_VERSION=%%v"
-)
-
-if not defined LATEST_VERSION (
-    echo Failed to extract version from the release information.
-    pause
-    exit /B
-)
-
-:: Strip 'v' prefix for numeric comparison
-set "SCRIPT_VERSION_NUM=%SCRIPT_VERSION:v=%"
-set "LATEST_VERSION_NUM=%LATEST_VERSION:v=%"
-
-:: Compare Versions
-call :CompareVersions "%SCRIPT_VERSION_NUM%" "%LATEST_VERSION_NUM%"
-
-if "%is_newer%"=="1" (
-    echo %GREEN% A new script version is available! %RESET%
-    echo Current version: %SCRIPT_VERSION%
-    echo Latest version : %LATEST_VERSION%
-    goto ask_download
-) else (
-    echo %GREEN% Your script is up-to-date. Version: %SCRIPT_VERSION% %RESET%
-    goto continue_script
-)
-
-::--------------------------
-:: Version Comparison Logic
-::--------------------------
-:CompareVersions
-setlocal EnableDelayedExpansion
-set "current=%~1"
-set "latest=%~2"
-
-for /f "tokens=1-3 delims=." %%a in ("!current!") do (
-    set "cur1=%%a"
-    set "cur2=%%b"
-    set "cur3=%%c"
-)
-for /f "tokens=1-3 delims=." %%a in ("!latest!") do (
-    set "lat1=%%a"
-    set "lat2=%%b"
-    set "lat3=%%c"
-)
-
-if !lat1! GTR !cur1! (endlocal & set "is_newer=1" & exit /b)
-if !lat1! LSS !cur1! (endlocal & set "is_newer=0" & exit /b)
-if !lat2! GTR !cur2! (endlocal & set "is_newer=1" & exit /b)
-if !lat2! LSS !cur2! (endlocal & set "is_newer=0" & exit /b)
-if !lat3! GTR !cur3! (endlocal & set "is_newer=1" & exit /b)
-if !lat3! LSS !cur3! (endlocal & set "is_newer=0" & exit /b)
-
-endlocal & set "is_newer=0"
-exit /b
-
-::--------------------------
-:: Ask to download new version
-::--------------------------
-:ask_download
-echo %GREEN% ========================================================================
-echo %GREEN%    :                                                                :
-echo %GREEN%    :  Do you want to download the latest version of the script?     : 
-echo %GREEN%    :                       (1 = Yes / 2 = No)                       :
-echo %GREEN% =======================================================================%RESET%
-echo.
-
-set "choice="
-set /p choice=" Choose an option (1 = Yes / 2 = No): "
-
-if "%choice%"=="1" (
-    call :DownloadLatestScript
-) else if "%choice%"=="2" (
-    goto continue_script
-) else (
-    echo %RED% Invalid input. Please type 1 or 2 only.%RESET%
-    timeout /t 2 >nul
-    goto ask_download
-)
-goto :eof
-
-:continue_script
 echo Getting the latest version information...
 curl -s "https://www.internetdownloadmanager.com/news.html" -o "%tempfile_html%"
 set "online_version="
@@ -170,7 +69,7 @@ if not defined online_version (
     exit /b
 )
 
-echo %GREEN% Latest version: !online_version! %RESET%
+echo %GREEN%Latest version: !online_version! %RESET%
 
 :: Scan the online version and generate the download code
 for /f "tokens=1,2,4 delims=. " %%a in ("!online_version!") do (
@@ -196,13 +95,13 @@ if defined installed (
     set "installed=!installed:Full=!"
     set "installed=!installed: =!"
     set "installed=!installed:b= Build !"
-    echo %GREEN% Internet Download Manager found. Installed version: !installed!%RESET%
+    echo %GREEN%Internet Download Manager found. Installed version: !installed!%RESET%
 ) else (
     setlocal disabledelayedexpansion
-    echo %RED% Error: Unable to find Internet Download Manager installation directory.%RESET%
-    echo %YELLOW% Please ensure Internet Download Manager is installed correctly. Then run this script again.%RESET%
+    echo %RED%Error: Unable to find Internet Download Manager installation directory.%RESET%
+    echo %YELLOW%Please ensure Internet Download Manager is installed correctly. Then run this script again.%RESET%
     echo.
-    echo %GREEN% You can download the latest version from here: %downloadurl%%RESET%
+    echo %GREEN%You can download the latest version from here: %downloadurl%%RESET%
     echo.
     echo Loading Menu . . .
     goto :menu
@@ -221,10 +120,10 @@ set /a o_total = 10000 * !o_major! + 100 * !o_minor! + !o_build!
 
 echo.
 if !i_total! GEQ !o_total! (
-    echo %GREEN% You already have the latest version of Internet Download Manager.%RESET%
+    echo %GREEN%You already have the latest version of Internet Download Manager.%RESET%
 ) else (
-    echo %YELLOW% A newer version of IDM is available!%RESET%
-    echo %GREEN% Please update to the latest version: !online_version!%RESET%
+    echo %YELLOW%A newer version of IDM is available!%RESET%
+    echo %GREEN%Please update to the latest version: !online_version!%RESET%
 )
 echo.
 
@@ -263,32 +162,6 @@ timeout /t 2 >nul
 goto :menu
 
 ::----------------------
-:: Download function for the latest script
-:DownloadLatestScript
-set "DOWNLOAD_URL="
-
-:: Extract download URL from JSON file
-for /f "tokens=1,* delims=:" %%a in ('findstr /i "browser_download_url" "%temp%\latest_release.json"') do (
-    set "line=%%b"
-    set "line=!line:~2!"
-    set "line=!line: =!"
-    set "line=!line:~0,-1!"
-    set "DOWNLOAD_URL=!line!"
-)
-
-:: Verify that the download URL was extracted correctly
-if not "!DOWNLOAD_URL!"=="" (
-    echo %GREEN% Opening your browser to download the latest script...%RESET%
-    echo.
-    start "" "!DOWNLOAD_URL!"
-    echo %YELLOW% If your download does not start automatically, copy and paste this URL into your browser:%RESET%
-    echo %YELLOW% !DOWNLOAD_URL!%RESET%
-) else (
-    echo %RED% Failed to retrieve download URL.%RESET%
-)
-exit
-
-::----------------------
 :DownloadLatestIDM
 call :check_internet
 
@@ -296,10 +169,11 @@ if /i "!online_version!"=="Unknown" (
     echo %RED% No version info available. Try checking for updates first.%RESET%
     exit /b
 )
-echo %GREEN% Opening your browser to download the latest IDM...%RESET%
+echo %GREEN%Opening your browser to download the latest IDM...%RESET%
 echo.
 start "" "%downloadurl%"
-echo %YELLOW% If your download does not start automatically, copy and paste this URL into your browser:%RESET%
+echo %YELLOW%If your download does not start automatically, copy and paste this URL into your browser: %RESET%
+echo %YELLOW%%downloadurl% %RESET%
 echo.
 exit /b
 
@@ -309,9 +183,11 @@ exit /b
 echo Checking internet connectivity...
 ping -n 1 google.com >nul 2>&1
 if errorlevel 1 (
-    echo %RED% Internet not available. Please check your connection.%RESET%
+    echo %RED%[!] Internet not available. Please check your connection.%RESET%
     pause
     exit /b
+) else (
+    echo %GREEN%[✓] Internet connection is active.%RESET%
 )
 exit /b
 
@@ -330,7 +206,7 @@ if defined DEFAULT_DEST_DIR (
     setlocal disabledelayedexpansion
     echo %RED% Error: Unable to find IDM installation directory.%RESET%
     echo %YELLOW% Please install IDM and try again.%RESET%
-    echo %GREEN% Download it here: !downloadurl!%RESET%
+    echo %GREEN%Download it here: !downloadurl!%RESET%
     pause
     exit /b
 )
@@ -358,7 +234,7 @@ if "%LName%"=="" set "LName=WorkStation"
 reg add "HKCU\SOFTWARE\DownloadManager" /v FName /t REG_SZ /d "%FName%" /f >nul
 reg add "HKCU\SOFTWARE\DownloadManager" /v LName /t REG_SZ /d "%LName%" /f >nul
 
-echo %GREEN% Internet Download Manager Activated.%RESET%
+echo %GREEN%Internet Download Manager Activated.%RESET%
 exit /b
 
 :verifyFile
@@ -376,7 +252,7 @@ exit /b
 ::----------------------
 :AddExtensions
 regedit /s "%EXTENSIONS_FILE%"
-echo %GREEN% Extra FileTypes Extensions updated.%RESET%
+echo %GREEN%Extra FileTypes Extensions updated.%RESET%
 exit /b
 
 ::----------------------
@@ -385,7 +261,7 @@ call :ActivateIDM
 call :AddExtensions
 echo.
 echo [%DATE% %TIME%] Activated IDM >> %SCRIPT_DIR%log.txt
-echo %GREEN% Congratulations. All tasks completed successfully!%RESET%
+echo %GREEN%Congratulations. All tasks completed successfully!%RESET%
 echo.
 exit /b
 
@@ -473,12 +349,12 @@ for %%v in ("FName" "LName" "Email" "Serial" "CheckUpdtVM" "tvfrdt" "LstCheck" "
     reg delete "HKCU\Software\DownloadManager" /v %%v /f >nul 2>&1
 )
 
-echo %GREEN% Registry cleanup completed.%RESET%
+echo %GREEN%Registry cleanup completed.%RESET%
 exit /b
 
 ::----------------------
 :quit
 echo.
-echo %GREEN% Thank you for using Coporton IDM Activation Script. Have a great day... %RESET%
+echo %GREEN%Thank you for using Coporton IDM Activation Script. Have a great day... %RESET%
 timeout /t 2 >nul
 exit
