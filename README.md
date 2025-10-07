@@ -4,7 +4,7 @@ IDM Activation Script is a tool designed to activate Internet Download Manager (
 
 ### 📝 **Latest Verison**
 - Coporton IDM Activation Script 2.5.7
-- Support Internet Download Manager 6.42 Build 48
+- Support Internet Download Manager 6.42 Build 49
 
 ## 💪 **Features**
 
