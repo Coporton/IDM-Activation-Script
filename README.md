@@ -69,7 +69,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## ℹ️ **Acknowledgments**
 
-- Special thanks to AI, that was instrumental in this script's functionality.
+- Special thanks to AI and oop7, that was instrumental in this script's functionality.
 
 ## ❓ **Contact**
 
